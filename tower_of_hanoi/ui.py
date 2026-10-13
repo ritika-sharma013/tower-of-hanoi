@@ -63,7 +63,8 @@ class HanoiApp:
         self.disk_selector.pack(side="left", padx=(0, 10))
         ttk.Button(controls, text="New game", command=self.new_game).pack(side="left")
         ttk.Label(controls, textvariable=self.move_text, style="Count.TLabel").pack(side="right", padx=(12, 0))
-        ttk.Button(controls, text="Run solution", style="Primary.TButton", command=self.toggle_auto_solve).pack(side="right", padx=(8, 0))
+        self.auto_button = ttk.Button(controls, text="Run solution", style="Primary.TButton", command=self.toggle_auto_solve)
+        self.auto_button.pack(side="right", padx=(8, 0))
         ttk.Button(controls, text="Next solution step", command=self.next_solution_step).pack(side="right")
 
         board_frame = ttk.Frame(shell, style="App.TFrame")
@@ -199,10 +200,8 @@ class HanoiApp:
         self._set_auto_button("Run solution")
 
     def _set_auto_button(self, label: str) -> None:
-        for child in self.root.winfo_children():
-            for widget in child.winfo_children():
-                if isinstance(widget, ttk.Button) and widget.cget("text") in {"Run solution", "Stop"}:
-                    widget.configure(text=label)
+        if hasattr(self, "auto_button"):
+            self.auto_button.configure(text=label)
 
     def _update_move_count(self) -> None:
         self.move_text.set(f"Moves: {self.game.move_count}")

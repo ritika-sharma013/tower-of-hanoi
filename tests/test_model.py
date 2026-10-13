@@ -3,7 +3,7 @@ import unittest
 from tower_of_hanoi.model import HanoiGame
 
 
-class HanoiGameTests(unittest.TestCase):
+class HanoiGa5meTests(unittest.TestCase):
     def test_starts_with_all_disks_on_first_peg(self) -> None:
         game = HanoiGame(3)
         self.assertEqual(game.pegs, {"A": [3, 2, 1], "B": [], "C": []})
@@ -23,7 +23,7 @@ class HanoiGameTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             game.move("A", "B")
         with self.assertRaises(ValueError):
-            game.move("A", "C")
+            game.move("C", "A")
         with self.assertRaises(ValueError):
             game.move("B", "B")
 

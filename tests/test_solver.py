@@ -22,6 +22,17 @@ class HanoiSolverTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             solve(3, source="A", destination="A", auxiliary="C")
 
+    def test_solver_handles_custom_peg_order(self) -> None:
+        game = HanoiGame(4)
+        game.pegs = {"A": [], "B": [4, 3, 2, 1], "C": []}
+        moves = list(solve(4, source="B", destination="A", auxiliary="C"))
+
+        for source, destination in moves:
+            game.move(source, destination)
+
+        self.assertEqual(game.pegs["A"], [4, 3, 2, 1])
+        self.assertEqual(len(moves), 15)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,4 +1,4 @@
-"""Recursive solution generator for Tower of Hanoi."""
+"""Iterative solution generator for Tower of Hanoi."""
 
 from collections.abc import Iterator
 
@@ -12,7 +12,7 @@ def solve(
     destination: str = "C",
     auxiliary: str = "B",
 ) -> Iterator[Move]:
-    """Yield the minimum sequence of moves for a Tower of Hanoi puzzle."""
+    """Yield the minimum sequence of moves without recursion."""
     if isinstance(disk_count, bool) or not isinstance(disk_count, int):
         raise TypeError("Disk count must be an integer.")
     if disk_count < 1:
@@ -20,12 +20,32 @@ def solve(
     if {source, destination, auxiliary} != _PEGS:
         raise ValueError("Source, destination, and auxiliary must be A, B, and C.")
 
-    def move_stack(count: int, start: str, end: str, spare: str) -> Iterator[Move]:
-        if count == 1:
-            yield start, end
-            return
-        yield from move_stack(count - 1, start, spare, end)
-        yield start, end
-        yield from move_stack(count - 1, spare, end, start)
+    def generate_moves() -> Iterator[Move]:
+        pegs = {
+            source: list(range(disk_count, 0, -1)),
+            destination: [],
+            auxiliary: [],
+        }
+        cycle = (source, auxiliary, destination) if disk_count % 2 == 0 else (source, destination, auxiliary)
+        smallest_peg = source
 
-    return move_stack(disk_count, source, destination, auxiliary)
+        for move_number in range(1, 2**disk_count):
+            if move_number % 2 == 1:
+                cycle_index = cycle.index(smallest_peg)
+                next_peg = cycle[(cycle_index + 1) % len(cycle)]
+                pegs[smallest_peg].pop()
+                pegs[next_peg].append(1)
+                yield smallest_peg, next_peg
+                smallest_peg = next_peg
+                continue
+
+            first, second = (peg for peg in (source, destination, auxiliary) if peg != smallest_peg)
+            if pegs[first] and (not pegs[second] or pegs[first][-1] < pegs[second][-1]):
+                start, end = first, second
+            else:
+                start, end = second, first
+            disk = pegs[start].pop()
+            pegs[end].append(disk)
+            yield start, end
+
+    return generate_moves()
